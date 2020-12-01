@@ -6,9 +6,9 @@ Home
     
 {% block content %}
 
-<div class='row mb-3'>
+<div class='row m-3'>
     <div class='col-md-4 mx-auto col-10'>
-        <form class='form' method='POST' action='create-post/'>
+        <form class='form' id='post-creation-form' method='POST' action='create-post/'>
             {% csrf_token %}
             <input type='hidden' value='/' name='next' />
             <textarea class='form-control' name='content' placeholder="what's going on?"></textarea>
@@ -22,35 +22,50 @@ Home
 </div>
 
 <script>
+const postFormEl = document.getElementById('post-creation-form');
 
-const postsDiv = document.getElementById('posts');
-
-const xhr = new XMLHttpRequest();
-const method = 'GET';
-const endpoint = '/posts';
-const responseType = 'json';
-
-function formatPost (post) {
-    console.log(post);
-    const formattedPost = `<div class='post border mb-2 mt-2 p-4' id=${post.id}>
-            <p>${post.content}</p>
-            <button class='btn btn-outline-info btn-sm like-btn'>Like</button></div>`;
-    return formattedPost;
+function handlePostFormSubmit(event) {
+    event.preventDefault();
+    console.log(event);
 }
 
-xhr.responseType = responseType;
-xhr.open(method, endpoint);
-xhr.onload = function() {
+postFormEl.addEventListener("submit", handlePostFormSubmit);
+
+const postsEl = document.getElementById('posts');
+
+function renderPosts(postsDiv) {
+    const xhr = new XMLHttpRequest();
+    const method = 'GET';
+    const endpoint = '/posts';
+    const responseType = 'json';
+    xhr.responseType = responseType;
+    xhr.open(method, endpoint);
+    xhr.onload = function() {
     const postsList = xhr.response.response;
     let allPosts = "";
-    for (let i = 0; i < postsList.length; i++) {
-        let postObj = postsList[i];
-        let currentPost = formatPost(postObj);
-        allPosts += currentPost;
+        for (let i = 0; i < postsList.length; i++) {
+            let postObj = postsList[i];
+            let currentPost = formatPost(postObj);
+            allPosts += currentPost;
+        }
+        postsDiv.innerHTML = allPosts;
     }
-    postsDiv.innerHTML = allPosts;
+    xhr.send();
 }
-xhr.send();
+
+renderPosts(postsEl);
+
+function likeBtn() {
+    return `<button class='btn btn-outline-info btn-sm like-btn'>Like</button>`;
+}
+
+function formatPost (post) {
+    const formattedPost = `<div class='post border mb-2 mt-2 p-4' id=${post.id}>
+            <p>${post.content}</p>
+            ${likeBtn()}
+            </div>`;
+    return formattedPost;
+}
 </script>
 
 {% endblock content %}
