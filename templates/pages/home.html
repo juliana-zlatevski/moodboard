@@ -5,11 +5,24 @@ Home
 {% endblock title %}
     
 {% block content %}
+
+<div class='row mb-3'>
+    <div class='col-md-4 mx-auto col-10'>
+        <form class='form' method='POST' action='create-post/'>
+            {% csrf_token %}
+            <input type='hidden' value='/' name='next' />
+            <textarea class='form-control' name='content' placeholder="what's going on?"></textarea>
+            <button class='btn btn-outline-info btn-sm' type='submit'>post</button>
+        </form>
+    </div>
+</div>
+
 <div class='col-6' id='posts'>
     Loading posts...
 </div>
 
 <script>
+
 const postsDiv = document.getElementById('posts');
 
 const xhr = new XMLHttpRequest();
@@ -17,22 +30,25 @@ const method = 'GET';
 const endpoint = '/posts';
 const responseType = 'json';
 
+function formatPost (post) {
+    console.log(post);
+    const formattedPost = `<div class='post border mb-2 mt-2 p-4' id=${post.id}>
+            <p>${post.content}</p>
+            <button class='btn btn-outline-info btn-sm like-btn'>Like</button></div>`;
+    return formattedPost;
+}
+
 xhr.responseType = responseType;
 xhr.open(method, endpoint);
 xhr.onload = function() {
-    const serverResponse = xhr.response;
-    const postsList = serverResponse.response;
-    let finalPostStr = "";
+    const postsList = xhr.response.response;
+    let allPosts = "";
     for (let i = 0; i < postsList.length; i++) {
-        let currentPost = `<div class='post border mb-2 mt-2 p-4' id=${postsList[i].id}>
-            <p>${postsList[i].content}</p>
-            <button class='btn btn-outline-info btn-sm like-btn'>
-                <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-lightning" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                <path fill-rule="evenodd" d="M11.251.068a.5.5 0 0 1 .227.58L9.677 6.5H13a.5.5 0 0 1 .364.843l-8 8.5a.5.5 0 0 1-.842-.49L6.323 9.5H3a.5.5 0 0 1-.364-.843l8-8.5a.5.5 0 0 1 .615-.09zM4.157 8.5H7a.5.5 0 0 1 .478.647L6.11 13.59l5.732-6.09H9a.5.5 0 0 1-.478-.647L9.89 2.41 4.157 8.5z"/></svg>
-            </button></div>`;
-            finalPostStr += currentPost;
+        let postObj = postsList[i];
+        let currentPost = formatPost(postObj);
+        allPosts += currentPost;
     }
-    postsDiv.innerHTML = finalPostStr;
+    postsDiv.innerHTML = allPosts;
 }
 xhr.send();
 </script>

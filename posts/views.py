@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse, Http404, JsonResponse
 from .forms import PostForm
 from .models import Post
@@ -19,9 +19,12 @@ def posts_list_view(request, *args, **kwargs):
 # create a new post
 def create_post_view(request, *args, **kwargs):
     form = PostForm(request.POST)
+    next_url = request.POST.get('next') or None
     if form.is_valid():
       post = form.save(commit=False)
       post.save()
+      if next_url != None:
+          return redirect(next_url)
       form = PostForm()
     return render(request, 'components/form.html', context={"form": form})
 
