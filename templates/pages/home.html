@@ -5,5 +5,34 @@ Home
 {% endblock title %}
     
 {% block content %}
-Welcome to MoodBoard
+<h1>Welcome to MoodBoard!</h1>
+
+<div id='posts'>
+    Replace me
+</div>
+
+<script>
+const postsDiv = document.getElementById('posts')
+postsDiv.innerHTML = 'Loading...'
+
+const post1 = '<h5>a post</h5>'
+const post2 = '<h5>a post</h5>'
+const post3 = '<h5>a post</h5>'
+postsDiv.innerHTML = post1 + post2 + post3
+
+const xhr = new XMLHttpRequest()
+const method = 'GET'
+const endpoint = '/posts'
+const responseType = 'json'
+
+xhr.responseType = responseType
+xhr.open(method, endpoint)
+xhr.onload = function() {
+    const serverResponse = xhr.response
+    const postsList = serverResponse.response
+    console.log(postsList)
+}
+xhr.send()
+</script>
+
 {% endblock content %}
