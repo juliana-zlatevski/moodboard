@@ -11,7 +11,7 @@ Home
         <form class='form' id='post-creation-form' method='POST' action='create-post/'>
             {% csrf_token %}
             <input type='hidden' value='/' name='next' />
-            <textarea class='form-control' name='content' placeholder="what's going on?"></textarea>
+            <textarea required='required' class='form-control' name='content' placeholder="what's going on?"></textarea>
             <button class='btn btn-outline-info btn-sm' type='submit'>post</button>
         </form>
     </div>
@@ -26,7 +26,22 @@ const postFormEl = document.getElementById('post-creation-form');
 
 function handlePostFormSubmit(event) {
     event.preventDefault();
-    console.log(event);
+    const postForm = event.target;
+    const postFormData = new FormData(postForm);
+    const endpoint = postForm.getAttribute("action");
+    const method = postForm.getAttribute("method");
+    const xhr = new XMLHttpRequest();
+    xhr.open(method, endpoint);
+    xhr.setRequestHeader("HTTP_X_REQUESTED_WITH", "XMLHttpRequest");
+    xhr.setRequestHeader("X-REQUESTED-WITH", "XMLHttpRequest");
+    xhr.onload = function() {
+        const newPost = JSON.parse(xhr.response);
+        const newPostContainer = formatPost(newPost);
+        const originalHtml = postsEl.innerHTML;
+        postsEl.innerHTML = newPostContainer + originalHtml;
+        postForm.reset();
+    }
+    xhr.send(postFormData);
 }
 
 postFormEl.addEventListener("submit", handlePostFormSubmit);
@@ -61,7 +76,8 @@ function likeBtn() {
 
 function formatPost (post) {
     const formattedPost = `<div class='post border mb-2 mt-2 p-4' id=${post.id}>
-            <p>${post.content}</p>
+            <h3>${post.content}</h3>
+            <p>posted ${post.created}</p>
             ${likeBtn()}
             </div>`;
     return formattedPost;

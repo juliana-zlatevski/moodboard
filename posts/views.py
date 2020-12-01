@@ -10,7 +10,7 @@ def home_view(request, *args, **kwargs):
 # post tweet view
 def posts_list_view(request, *args, **kwargs):
     allPosts = Post.objects.all()
-    posts_list = [{"id": post.id, "content": post.content} for post in allPosts]
+    posts_list = [post.serialize() for post in allPosts]
     data = {
       "response": posts_list
     }
@@ -21,11 +21,13 @@ def create_post_view(request, *args, **kwargs):
     form = PostForm(request.POST)
     next_url = request.POST.get('next') or None
     if form.is_valid():
-      post = form.save(commit=False)
-      post.save()
-      if next_url != None:
-          return redirect(next_url)
-      form = PostForm()
+        post = form.save(commit=False)
+        post.save()
+        if request.is_ajax():
+            return JsonResponse(post.serialize())
+        if next_url != None:
+            return redirect(next_url)
+        form = PostForm()
     return render(request, 'components/form.html', context={"form": form})
 
 # post detail view
