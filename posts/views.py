@@ -7,6 +7,9 @@ from django.core.exceptions import PermissionDenied
 
 # home page
 def home_view(request, *args, **kwargs):
+    return render(request, "pages/welcome.html", context={})
+
+def home_view_posts(request, *args, **kwargs):
     return render(request, "pages/home.html", context={})
 
 # post tweet view
