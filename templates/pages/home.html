@@ -36,6 +36,7 @@ function handlePostFormSubmit(event) {
     xhr.setRequestHeader("X-REQUESTED-WITH", "XMLHttpRequest");
     xhr.onload = function() {
         const newPost = JSON.parse(xhr.response);
+        console.log(newPost);
         const newPostContainer = formatPost(newPost);
         const originalHtml = postsEl.innerHTML;
         postsEl.innerHTML = newPostContainer + originalHtml;
@@ -83,5 +84,4 @@ function formatPost (post) {
     return formattedPost;
 }
 </script>
-
 {% endblock content %}

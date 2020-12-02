@@ -1,7 +1,9 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, Http404, JsonResponse
+from django.conf import settings
 from .forms import PostForm
 from .models import Post
+from django.core.exceptions import PermissionDenied
 
 # home page
 def home_view(request, *args, **kwargs):
@@ -22,6 +24,7 @@ def create_post_view(request, *args, **kwargs):
     next_url = request.POST.get('next') or None
     if form.is_valid():
         post = form.save(commit=False)
+        post.user = request.user
         post.save()
         if request.is_ajax():
             return JsonResponse(post.serialize())
